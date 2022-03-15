@@ -73,12 +73,12 @@ class User(db.Model):
 
     image_url = db.Column(
         db.Text,
-        default="/static/images/default-pic.png",
+        default="https://cdn.landesa.org/wp-content/uploads/default-user-image.png",
     )
 
     header_image_url = db.Column(
         db.Text,
-        default="/static/images/warbler-hero.jpg"
+        default="https://images.unsplash.com/photo-1617957743103-310accdfb999?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1932&q=80"
     )
 
     bio = db.Column(

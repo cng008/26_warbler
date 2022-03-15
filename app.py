@@ -79,7 +79,7 @@ def signup():
                 username=form.username.data,
                 password=form.password.data,
                 email=form.email.data,
-                image_url=form.image_url.data or User.image_url.default.arg,
+                image_url=form.image_url.data or User.image_url.default.arg
             )
             db.session.commit()
 
@@ -274,8 +274,8 @@ def profile():
         if User.authenticate(user.username, form.password.data):
             user.username = form.username.data
             user.email = form.email.data
-            user.image_url = form.image_url.data or "/static/images/default-pic.png"
-            user.header_image_url = form.header_image_url.data or "/static/images/warbler-hero.jpg"
+            user.image_url = form.image_url.data or User.image_url.default.arg,
+            user.header_image_url = form.header_image_url.data or User.header_image_url.default.arg,
             user.bio = form.bio.data
             user.location = form.location.data
 
