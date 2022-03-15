@@ -18,9 +18,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = (
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = False
-app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = True
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "it's a secret")
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "it's a secret")
 
 toolbar = DebugToolbarExtension(app)
 
@@ -69,8 +68,11 @@ def signup():
     and re-present form.
     """
 
-    form = UserAddForm()
+    if CURR_USER_KEY in session:
+        flash("You're already logged in!", 'info')
+        return redirect(f"/users/{session[CURR_USER_KEY]}")
 
+    form = UserAddForm()
     if form.validate_on_submit():
         try:
             user = User.signup(
@@ -97,8 +99,11 @@ def signup():
 def login():
     """Handle user login."""
 
-    form = LoginForm()
+    if CURR_USER_KEY in session:
+        flash("You're already logged in!", 'info')
+        return redirect(f"/users/{session[CURR_USER_KEY]}")
 
+    form = LoginForm()
     if form.validate_on_submit():
         user = User.authenticate(form.username.data,
                                  form.password.data)
@@ -116,6 +121,10 @@ def login():
 @app.route('/logout')
 def logout():
     """Handle logout of user."""
+
+    if not g.user:
+        flash("You need to be logged into an account to do that...", "danger")
+        return redirect("/")
 
     session.pop(CURR_USER_KEY)
     flash("You've been logged out.", "success")
