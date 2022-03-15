@@ -1,6 +1,6 @@
 """SQLAlchemy models for Warbler."""
 
-from datetime import datetime
+import datetime
 
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
@@ -188,7 +188,7 @@ class Message(db.Model):
     timestamp = db.Column(
         db.DateTime,
         nullable=False,
-        default=datetime.utcnow(),
+        default=datetime.datetime.now,
     )
 
     user_id = db.Column(
@@ -198,6 +198,11 @@ class Message(db.Model):
     )
 
     user = db.relationship('User')
+
+    @property
+    def friendly_date(self):
+        """Return nicely-formatted date."""
+        return self.timestamp.strftime("%b %-d,  %Y @ %-I:%M %p")
 
 
 def connect_db(app):
