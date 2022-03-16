@@ -208,6 +208,10 @@ def add_follow(follow_id):
         flash("Access unauthorized.", "danger")
         return redirect("/")
 
+    if g.user.id == follow_id:
+        flash("You can't follow yourself...", 'info')
+        return redirect("/users")
+
     followed_user = User.query.get_or_404(follow_id)
     g.user.following.append(followed_user)
     db.session.commit()
