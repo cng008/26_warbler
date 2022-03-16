@@ -165,9 +165,12 @@ def users_show(user_id):
                 .order_by(Message.timestamp.desc())
                 .limit(100)
                 .all())
+    if g.user:
+        likes = [message.id for message in g.user.likes]
+        return render_template('users/show.html', user=user, messages=messages, likes=likes)
     
-    likes = [message.id for message in g.user.likes]
-    return render_template('users/show.html', user=user, messages=messages, likes=likes)
+    else:
+        return render_template('users/show.html', user=user, messages=messages)
 
 
 @app.route('/users/<int:user_id>/following')
@@ -206,7 +209,8 @@ def add_follow(follow_id):
     g.user.following.append(followed_user)
     db.session.commit()
 
-    return redirect(request.referrer) # https://stackoverflow.com/a/61902927
+    # return redirect(request.referrer) # https://stackoverflow.com/a/61902927
+    return redirect("/")
 
 
 @app.route('/users/stop-following/<int:follow_id>', methods=['POST'])
@@ -221,7 +225,8 @@ def stop_following(follow_id):
     g.user.following.remove(followed_user)
     db.session.commit()
 
-    return redirect(request.referrer) # https://stackoverflow.com/a/61902927
+    # return redirect(request.referrer) # https://stackoverflow.com/a/61902927
+    return redirect("/")
 
 
 @app.route('/users/<int:user_id>/likes', methods=["GET"])
@@ -256,7 +261,8 @@ def add_like(message_id):
 
     db.session.commit()
 
-    return redirect(request.referrer) # https://stackoverflow.com/a/61902927
+    # return redirect(request.referrer) # https://stackoverflow.com/a/61902927
+    return redirect("/")
 
 
 @app.route('/users/profile', methods=["GET", "POST"])
