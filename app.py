@@ -1,5 +1,3 @@
-import os
-
 from flask import Flask, render_template, request, flash, redirect, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
@@ -7,15 +5,20 @@ from sqlalchemy.exc import IntegrityError
 from forms import UserAddForm, LoginForm, MessageForm, UserEditForm
 from models import db, connect_db, User, Message
 
+import os
+import re
+uri = os.environ.get('DATABASE_URL', 'postgresql:///warbler')
+if uri.startswith("postgres://"):
+    uri = uri.replace("postgres://", "postgresql://", 1)
+# rest of connection code using the connection string `uri`
+
 CURR_USER_KEY = "curr_user"
 
 app = Flask(__name__)
 
 # Get DB_URI from environ variable (useful for production/testing) or,
 # if not set there, use development local db.
-app.config['SQLALCHEMY_DATABASE_URI'] = (
-    os.environ.get('DATABASE_URL', 'postgresql:///warbler'))
-
+app.config['SQLALCHEMY_DATABASE_URI'] = uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = False
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
@@ -209,8 +212,8 @@ def add_follow(follow_id):
     g.user.following.append(followed_user)
     db.session.commit()
 
-    # return redirect(request.referrer) # https://stackoverflow.com/a/61902927
-    return redirect("/")
+    return redirect(request.referrer) # https://stackoverflow.com/a/61902927
+    # return redirect("/")
 
 
 @app.route('/users/stop-following/<int:follow_id>', methods=['POST'])
@@ -225,8 +228,8 @@ def stop_following(follow_id):
     g.user.following.remove(followed_user)
     db.session.commit()
 
-    # return redirect(request.referrer) # https://stackoverflow.com/a/61902927
-    return redirect("/")
+    return redirect(request.referrer) # https://stackoverflow.com/a/61902927
+    # return redirect("/")
 
 
 @app.route('/users/<int:user_id>/likes', methods=["GET"])
@@ -261,8 +264,8 @@ def add_like(message_id):
 
     db.session.commit()
 
-    # return redirect(request.referrer) # https://stackoverflow.com/a/61902927
-    return redirect("/")
+    return redirect(request.referrer) # https://stackoverflow.com/a/61902927
+    # return redirect("/")
 
 
 @app.route('/users/profile', methods=["GET", "POST"])
