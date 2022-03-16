@@ -126,9 +126,10 @@ def logout():
         flash("You need to be logged into an account to do that...", "danger")
         return redirect("/")
 
-    session.pop(CURR_USER_KEY)
-    flash("You've been logged out.", "success")
-    return redirect('/login')
+    if CURR_USER_KEY in session:
+        del session[CURR_USER_KEY]
+        flash("You've been logged out.", "success")
+        return redirect('/login')
 
 ##############################################################################
 # General user routes:
@@ -166,7 +167,6 @@ def users_show(user_id):
                 .all())
     
     likes = [message.id for message in g.user.likes]
-
     return render_template('users/show.html', user=user, messages=messages, likes=likes)
 
 
@@ -217,7 +217,7 @@ def stop_following(follow_id):
         flash("Access unauthorized.", "danger")
         return redirect("/")
 
-    followed_user = User.query.get(follow_id)
+    followed_user = User.query.get_or_404(follow_id)
     g.user.following.remove(followed_user)
     db.session.commit()
 
@@ -335,7 +335,7 @@ def messages_add():
 def messages_show(message_id):
     """Show a message."""
 
-    msg = Message.query.get(message_id)
+    msg = Message.query.get_or_404(message_id)
     return render_template('messages/show.html', message=msg)
 
 
@@ -347,7 +347,11 @@ def messages_destroy(message_id):
         flash("Access unauthorized.", "danger")
         return redirect("/")
 
-    msg = Message.query.get(message_id)
+    msg = Message.query.get_or_404(message_id)
+    if msg.user_id != g.user.id:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
     db.session.delete(msg)
     db.session.commit()
 
@@ -383,6 +387,12 @@ def homepage():
     else:
         return render_template('home-anon.html')
 
+
+@app.errorhandler(404)
+def page_not_found(e):
+    """Show 404 NOT FOUND page."""
+
+    return render_template('404.html'), 404
 
 ##############################################################################
 # Turn off all caching in Flask
