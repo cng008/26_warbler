@@ -90,8 +90,7 @@ class UserModelTestCase(TestCase):
     def test_is_following(self):
         """Does user1 follow user2?"""
 
-        rel = Follows(user_being_followed_id=222, user_following_id=111)
-        db.session.add(rel)
+        self.u1.following.append(self.u2)
         db.session.commit()
 
         self.assertEqual(self.u1.is_following(self.u2), 1)
@@ -101,12 +100,11 @@ class UserModelTestCase(TestCase):
     def test_is_followed_by(self):
         """Does user2 follow user1?"""
 
-        rel = Follows(user_being_followed_id=111, user_following_id=222)
-        db.session.add(rel)
+        self.u1.following.append(self.u2)
         db.session.commit()
 
-        self.assertEqual(self.u2.is_following(self.u1), 1)
-        self.assertEqual(self.u1.is_following(self.u2), 0)
+        self.assertTrue(self.u2.is_followed_by(self.u1), 1)
+        self.assertFalse(self.u1.is_followed_by(self.u2), 0)
 
 
 ####### SIGNUP TESTS ######################

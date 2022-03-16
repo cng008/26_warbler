@@ -88,8 +88,8 @@ class MessageModelTestCase(TestCase):
         db.session.add_all([m1, m2])
         db.session.commit()
 
-        rel = Likes(user_id=222, message_id=1)
-        db.session.add(rel)
+        u.likes.append(m1)
+        
         db.session.commit()
 
         l = Likes.query.filter(Likes.user_id == u.id).all()
